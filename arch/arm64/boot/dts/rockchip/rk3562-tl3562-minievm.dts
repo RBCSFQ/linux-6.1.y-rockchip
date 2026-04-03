@@ -308,6 +308,14 @@
 	};
 };
 
+&csi2_dphy0_hw {
+	status = "okay";
+};
+
+&csi2_dphy1_hw {
+	status = "okay";
+};
+
 &csi2_dphy3 {
 	status = "okay";
 
@@ -337,14 +345,6 @@
 			};
 		};
 	};
-};
-
-&csi2_dphy0_hw {
-	status = "okay";
-};
-
-&csi2_dphy1_hw {
-	status = "okay";
 };
 
 &dfi {
@@ -883,6 +883,37 @@
 	status = "okay";
 };
 
+&mdio0 {
+	rgmii_phy: phy@0 {
+		/* Motorcomm YT8521SH */
+		compatible = "ethernet-phy-id0000.011a";
+		reg = <0x0>;
+
+		clocks = <&cru CLK_GMAC_ETH_OUT2IO>;
+		assigned-clocks = <&cru CLK_GMAC_ETH_OUT2IO>;
+		assigned-clock-rates = <25000000>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&rgmii_phy_rst_l>;
+
+		/* Reset time is 20ms, 100ms for yt8521 */
+		reset-assert-us = <20000>;
+		reset-deassert-us = <200000>;
+		reset-gpios = <&gpio3 RK_PD0 GPIO_ACTIVE_LOW>;
+	};
+};
+
+&mdio1 {
+	rmii_phy: phy@0 {
+		/* Motorcomm YT8512H */
+		compatible = "ethernet-phy-id0000.0128";
+		reg = <0x0>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&rmii_phy_rst_l>;
+	};
+};
+
 &mipi0_csi2 {
 	status = "okay";
 
@@ -942,37 +973,6 @@
 				remote-endpoint = <&cif_mipi_in1>;
 			};
 		};
-	};
-};
-
-&mdio0 {
-	rgmii_phy: phy@0 {
-		/* Motorcomm YT8521SH */
-		compatible = "ethernet-phy-id0000.011a";
-		reg = <0x0>;
-
-		clocks = <&cru CLK_GMAC_ETH_OUT2IO>;
-		assigned-clocks = <&cru CLK_GMAC_ETH_OUT2IO>;
-		assigned-clock-rates = <25000000>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&rgmii_phy_rst_l>;
-
-		/* Reset time is 20ms, 100ms for yt8521 */
-		reset-assert-us = <20000>;
-		reset-deassert-us = <200000>;
-		reset-gpios = <&gpio3 RK_PD0 GPIO_ACTIVE_LOW>;
-	};
-};
-
-&mdio1 {
-	rmii_phy: phy@0 {
-		/* Motorcomm YT8512H */
-		compatible = "ethernet-phy-id0000.0128";
-		reg = <0x0>;
-
-		pinctrl-names = "default";
-		pinctrl-0 = <&rmii_phy_rst_l>;
 	};
 };
 
@@ -1073,10 +1073,6 @@
 	status = "okay";
 };
 
-&rkcif_mmu {
-	status = "okay";
-};
-
 &rkcif_mipi_lvds {
 	status = "okay";
 
@@ -1115,6 +1111,10 @@
 			remote-endpoint = <&isp_vir1>;
 		};
 	};
+};
+
+&rkcif_mmu {
+	status = "okay";
 };
 
 &rkisp {
@@ -1182,39 +1182,6 @@
 	status = "okay";
 };
 
-&route_dsi {
-	status = "okay";
-};
-
-&saradc0 {
-	status = "okay";
-	vref-supply = <&vcc_1v8>;
-};
-
-&saradc1 {
-	status = "okay";
-	vref-supply = <&vcc_1v8>;
-};
-
-&sai0 {
-	status = "okay";
-	pinctrl-names = "default";
-	pinctrl-0 = <&i2s0m0_lrck
-		     &i2s0m0_sclk
-		     &i2s0m0_sdi0
-		     &i2s0m0_sdo0>;
-};
-
-&spi0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&spi0m0_csn0 &spi0m0_pins>;
-	satus = "okay";
-};
-
-&tsadc {
-	status = "okay";
-};
-
 &rockchip_amp {
 	clocks = <&cru FCLK_BUS_CM0_CORE>, <&cru CLK_BUS_CM0_RTC>,
 		<&cru PCLK_MAILBOX>, <&cru PCLK_INTC>,
@@ -1243,20 +1210,14 @@
 		     &i2s0m0_sdo0>;
 };
 
-&sdmmc0 {
-	no-sdio;
-	no-mmc;
-	bus-width = <4>;
-	cap-mmc-highspeed;
-	cap-sd-highspeed;
-	disable-wp;
-	sd-uhs-sdr50;
-	sd-uhs-sdr104;
-	vmmc-supply = <&vcc3v3_sd>;
-	vqmmc-supply = <&vccio_sd>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&sdmmc0_bus4 &sdmmc0_clk &sdmmc0_cmd &sdmmc0_det>;
+&saradc0 {
 	status = "okay";
+	vref-supply = <&vcc_1v8>;
+};
+
+&saradc1 {
+	status = "okay";
+	vref-supply = <&vcc_1v8>;
 };
 
 &sdhci {
@@ -1274,6 +1235,28 @@
 	status = "okay";
 };
 
+&sdmmc0 {
+	no-sdio;
+	no-mmc;
+	bus-width = <4>;
+	cap-mmc-highspeed;
+	cap-sd-highspeed;
+	disable-wp;
+	sd-uhs-sdr50;
+	sd-uhs-sdr104;
+	vmmc-supply = <&vcc3v3_sd>;
+	vqmmc-supply = <&vccio_sd>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdmmc0_bus4 &sdmmc0_clk &sdmmc0_cmd &sdmmc0_det>;
+	status = "okay";
+};
+
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0m0_csn0 &spi0m0_pins>;
+	satus = "okay";
+};
+
 &tsadc {
 	status = "okay";
 };
@@ -1288,14 +1271,6 @@
 };
 
 &u2phy_otg {
-	status = "okay";
-};
-
-&usb_host0_ehci {
-	status = "okay";
-};
-
-&usb_host0_ohci {
 	status = "okay";
 };
 
@@ -1318,14 +1293,22 @@
 	};
 };
 
+&usb_host0_ehci {
+	status = "okay";
+};
+
+&usb_host0_ohci {
+	status = "okay";
+};
+
+&video_phy {
+	status = "okay";
+};
+
 &vop {
 	status = "okay";
 };
 
 &vop_mmu {
-	status = "okay";
-};
-
-&video_phy {
 	status = "okay";
 };
