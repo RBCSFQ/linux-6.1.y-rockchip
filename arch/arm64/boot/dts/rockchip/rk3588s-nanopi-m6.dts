@@ -296,7 +296,7 @@ dsi1_i2c: &i2c5 {
 	rt5616: rt5616@1b {
 		status = "okay";
 		#sound-dai-cells = <0>;
-		compatible = "rt5616";
+		compatible = "realtek,rt5616";
 		reg = <0x1b>;
 		clocks = <&mclkout_i2s0>;
 		clock-names = "mclk";
