@@ -1,0 +1,166 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2025 Rockchip Electronics Co., Ltd.
+ * Copyright (c) 2026 flippy (flippy@sina.com)
+ */
+
+#include "rv1126b-xiaoyu-50ipc.dts"
+
+/*
+ * csi2_dphy0 -> csi0(rx0) clk0 + 4 lane ==> imx415_0
+ * csi2_dphy1 -> csi0(rx0) clk0 + 2 lane 0/1
+ * csi2_dphy2 -> csi0(rx0) clk1 + 2 lane 2/3
+ * csi2_dphy3 -> csi1(rx1) clk0 + 4 lane ==> imx415_1
+ * csi2_dphy4 -> csi1(rx1) clk0 + 2 lane 0/1
+ * csi2_dphy5 -> csi1(rx1) clk1 + 2 lane 2/3
+ */
+&csi2_dphy3 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			csi_dphy3_input0: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&imx415_out1>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			csidphy3_out: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&mipi2_csi2_input>;
+			};
+		};
+	};
+};
+
+/* censor1 */
+&i2c4 {
+	status = "okay";
+	pinctrl-0 = <&i2c4m2_pins>;
+
+	imx415_1: imx415_1@37 {
+		compatible = "sony,imx415";
+		reg = <0x37>;
+		clocks = <&cru CLK_MIPI2_OUT2IO>;
+		clock-names = "xvclk";
+
+		avdd-supply = <&vcc3v3_sys>;
+		dovdd-supply = <&vcc3v3_sys>;
+		dvdd-supply = <&vcc3v3_sys>;
+
+		reset-gpios = <&gpio4 RK_PA2 GPIO_ACTIVE_LOW>;
+		power-gpios = <&gpio1 RK_PB7 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&cam_clk2_pins>,
+			    <&imx415_1_rst_l>,
+			    <&imx415_1_pwr_h>;
+		rockchip,camera-module-index = <1>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "default";
+		rockchip,camera-module-lens-name = "default";
+		port {
+			imx415_out1: endpoint {
+				remote-endpoint = <&csi_dphy3_input0>;
+				data-lanes = <1 2 3 4>;
+			};
+		};
+	};
+};
+
+&mipi2_csi2 {
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi2_csi2_input: endpoint@1 {
+				reg = <1>;
+				remote-endpoint = <&csidphy3_out>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			mipi2_csi2_output: endpoint@0 {
+				reg = <0>;
+				remote-endpoint = <&cif_mipi_in2>;
+			};
+		};
+	};
+};
+
+&pinctrl {
+	sensors {
+		imx415_1_rst_l: imx415-1-rst-l {
+			rockchip,pins = <4 RK_PA2 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+
+		imx415_1_pwr_h: imx415-1-pwr-h {
+			rockchip,pins = <1 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+};
+
+&rkcif_mipi_lvds2 {
+	status = "okay";
+
+	port {
+		cif_mipi_in2: endpoint {
+			remote-endpoint = <&mipi2_csi2_output>;
+		};
+	};
+};
+
+&rkcif_mipi_lvds2_sditf {
+	status = "okay";
+
+	port {
+		mipi_lvds2_sditf: endpoint {
+			remote-endpoint = <&isp_vir1>;
+		};
+	};
+};
+
+&rkisp_vir1 {
+	status = "okay";
+
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		isp_vir1: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&mipi_lvds2_sditf>;
+		};
+	};
+};
+
+&rkisp_vir1_sditf {
+	status = "okay";
+};
+
+&rkvpss_vir1 {
+	status = "okay";
+};
