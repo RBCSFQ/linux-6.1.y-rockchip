@@ -458,10 +458,6 @@
 	status = "okay";
 };
 
-&fiq_debugger {
-	status = "okay";
-};
-
 &fspi0 {
 	status = "disabled";
 
@@ -1059,6 +1055,11 @@
 };
 
 &tsadc {
+	status = "okay";
+};
+
+/* debug port */
+&uart0 {
 	status = "okay";
 };
 
