@@ -27,6 +27,11 @@
 		rockchip,format = "i2s";
 		rockchip,mclk-fs-mapping = <256 1024>;
 		rockchip,cpu = <&sai2>;
+		/*
+		 * audio_codec_pmu: mic0
+		 * audio_codec: mic1
+		 * acdcdig_dsm: speak
+		 */
 		rockchip,codec = <&audio_codec_pmu>, <&audio_codec>, <&acdcdig_dsm>;
 		status = "okay";
 	};
@@ -115,26 +120,6 @@
 			label = "yellow:work";
 			linux,default-trigger = "heartbeat";
 			status = "okay";
-		};
-	};
-
-	pdm_codec: dummy-codec {
-		#sound-dai-cells = <0>;
-		compatible = "rockchip,dummy-codec";
-		status = "okay";
-	};
-
-	pdm_mic_array: pdm-mic-array {
-		status = "disabled";
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "rockchip,pdm-mic-array";
-
-		simple-audio-card,cpu {
-			sound-dai = <&pdm>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&pdm_codec>;
 		};
 	};
 
@@ -254,16 +239,19 @@
 	};
 };
 
+/* speak */
 &acdcdig_dsm {
 	pa-ctl-gpios = <&gpio0 RK_PA4 GPIO_ACTIVE_HIGH>;
 	pinctrl-0 = <&dsm_aud_rn_pins &dsm_aud_rp_pins>;
 	status = "okay";
 };
 
+/* mic1 */
 &audio_codec {
 	status = "okay";
 };
 
+/* mic0 */
 &audio_codec_pmu {
 	status = "okay";
 };
@@ -796,10 +784,6 @@
 	};
 };
 
-&pdm {
-	status = "disabled";
-};
-
 /* vdd_npu */
 &pwm0_8ch_1 {
 	pinctrl-0 = <&pwm0m0_ch1_pins>;
@@ -987,6 +971,15 @@
 	logo,mode = "center";
 	charge_logo,mode = "center";
 	connect = <&vop_out_dsi>;
+};
+
+&rtc {
+	status = "okay";
+};
+
+/* export to fpc */
+&sai0 {
+	status = "okay";
 };
 
 &sai2 {
