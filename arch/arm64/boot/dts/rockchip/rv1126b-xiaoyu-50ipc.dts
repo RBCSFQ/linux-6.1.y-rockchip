@@ -1053,6 +1053,7 @@
 
 /* debug port */
 &uart0 {
+	pinctrl-0 = <&uart0m2_xfer_pins>;
 	status = "okay";
 };
 
