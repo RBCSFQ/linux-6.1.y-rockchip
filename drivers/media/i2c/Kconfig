@@ -2234,7 +2234,7 @@ config VIDEO_SC850SL
 
 config VIDEO_SENSOR_ADAPTER
 	tristate "Rockchip sensor driver adapter"
-	depends on I2C && VIDEO_DEV
+	depends on I2C && VIDEO_DEV && VIDEO_ROCKCHIP_CIF
 	select MEDIA_CONTROLLER
 	select VIDEO_V4L2_SUBDEV_API
 	select V4L2_FWNODE
