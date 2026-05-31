@@ -261,10 +261,12 @@
 };
 
 /*
- * csi2_dphy0 -> csi0(rx0) clk0 + 4 lane ==> imx415_0
+ * csi2_dphy0 -> csi0(rx0) clk0 + 4 lane ==> imx415_0 
+ *                           or + 2 lane ==> sc450ai_0
  * csi2_dphy1 -> csi0(rx0) clk0 + 2 lane 0/1
  * csi2_dphy2 -> csi0(rx0) clk1 + 2 lane 2/3
  * csi2_dphy3 -> csi1(rx1) clk0 + 4 lane ==> imx415_1
+ *                              + 2 lane ==> sc450ai_1
  * csi2_dphy4 -> csi1(rx1) clk0 + 2 lane 0/1
  * csi2_dphy5 -> csi1(rx1) clk1 + 2 lane 2/3
  */
@@ -280,9 +282,15 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 
-			csi_dphy_input0: endpoint@1 {
+			csi_dphy_input1: endpoint@1 {
 				reg = <1>;
-				remote-endpoint = <&imx415_out0>;
+				remote-endpoint = <&sc450ai_0_out>;
+				data-lanes = <1 2>;
+			};
+
+			csi_dphy_input2: endpoint@2 {
+				reg = <2>;
+				remote-endpoint = <&imx415_0_out>;
 				data-lanes = <1 2 3 4>;
 			};
 		};
@@ -600,8 +608,38 @@
 
 /* sensor0 */
 &i2c3 {
-	status = "okay";
+	clock-frequency = <400000>;
 	pinctrl-0 = <&i2c3m1_pins>;
+	status = "okay";
+
+	sc450ai_0: sc450ai_0@30 {
+		compatible = "smartsens,sc450ai";
+		reg = <0x30>;
+		clocks = <&cru CLK_MIPI0_OUT2IO>;
+		clock-names = "xvclk";
+
+		avdd-supply = <&vcc3v3_sys>;
+		dovdd-supply = <&vcc3v3_sys>;
+		dvdd-supply = <&vcc3v3_sys>;
+
+		reset-gpios = <&gpio4 RK_PA0 GPIO_ACTIVE_HIGH>;
+		pwdn-gpios = <&gpio1 RK_PB6 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&cam_clk0_pins>;
+
+		rockchip,camera-module-index = <0>;
+		rockchip,camera-module-facing = "back";
+		rockchip,camera-module-name = "CRK4F4209";
+		rockchip,camera-module-lens-name = "styleTstP0";
+		status = "okay";
+
+		port {
+			sc450ai_0_out: endpoint {
+				remote-endpoint = <&csi_dphy_input1>;
+				data-lanes = <1 2>;
+			};
+		};
+	};
 
 	imx415_0: imx415_0@37 {
 		compatible = "sony,imx415";
@@ -616,17 +654,17 @@
 		reset-gpios = <&gpio4 RK_PA0 GPIO_ACTIVE_LOW>;
 		power-gpios = <&gpio1 RK_PB6 GPIO_ACTIVE_HIGH>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&cam_clk0_pins>,
-			    <&imx415_0_rst_l>,
-			    <&imx415_0_pwr_h>;
+		pinctrl-0 = <&cam_clk0_pins>;
+
 		rockchip,camera-module-index = <0>;
 		rockchip,camera-module-facing = "back";
-		rockchip,camera-module-name = "default";
-		rockchip,camera-module-lens-name = "default";
+		rockchip,camera-module-name = "xiaoyu";
+		rockchip,camera-module-lens-name = "50ipc";
+		status = "okay";
 
 		port {
-			imx415_out0: endpoint {
-				remote-endpoint = <&csi_dphy_input0>;
+			imx415_0_out: endpoint {
+				remote-endpoint = <&csi_dphy_input2>;
 				data-lanes = <1 2 3 4>;
 			};
 		};
@@ -770,16 +808,6 @@
 
 		touch_irq: touch_irq {
 			rockchip,pins = <5 RK_PA4 RK_FUNC_GPIO &pcfg_pull_up>;
-		};
-	};
-
-	sensors {
-		imx415_0_rst_l: imx415-0-rst-l {
-			rockchip,pins = <4 RK_PA0 RK_FUNC_GPIO &pcfg_pull_up>;
-		};
-
-		imx415_0_pwr_h: imx415-0-pwr-h {
-			rockchip,pins = <1 RK_PB6 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 };
@@ -974,11 +1002,6 @@
 };
 
 &rtc {
-	status = "okay";
-};
-
-/* export to fpc */
-&sai0 {
 	status = "okay";
 };
 
