@@ -1,7 +1,7 @@
 /dts-v1/;
 
-	serial-number = "w132d-armbian";
 / {
+	serial-number = "w132d-armbian";
 	compatible = "rockchip,rk3528-w132d\0rockchip,rk3528";
 	interrupt-parent = <0x01>;
 	#address-cells = <0x02>;
@@ -469,7 +469,7 @@
 		};
 	};
 
-	mpp-srv {
+mpp-srv {
 		compatible = "rockchip,mpp-service";
 		rockchip,taskqueue-count = <0x05>;
 		rockchip,resetgroup-count = <0x05>;
