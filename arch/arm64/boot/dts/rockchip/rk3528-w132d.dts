@@ -25,7 +25,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60";
+		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait";
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -409,7 +409,12 @@
 			connect = <&vp0_out_hdmi>;
 		};
 		route_tve: route-tve {
-			status = "disabled";
+			status = "okay";
+			logo,uboot = "logo.bmp";
+			logo,kernel = "logo_kernel.bmp";
+			logo,mode = "center";
+			charge_logo,mode = "center";
+			connect = <&vp1_out_tve>;
 		};
 	};
 };
@@ -641,11 +646,11 @@
 };
 
 &tve {
-	status = "disabled";
+	status = "okay";
 };
 
 &tve_in_vp1 {
-	status = "disabled";
+	status = "okay";
 };
 
 /*
