@@ -599,10 +599,18 @@
 };
 
 &usb_host0_ehci {
+	phys = <&u2phy_host>;
+	phy-names = "usb";
+	power-domains = <&power RK3528_PD_VO>;
+	vbus-supply = <&vcc5v0_host>;
 	status = "okay";
 };
 
 &usb_host0_ohci {
+	phys = <&u2phy_host>;
+	phy-names = "usb";
+	power-domains = <&power RK3528_PD_VO>;
+	vbus-supply = <&vcc5v0_host>;
 	status = "okay";
 };
 
@@ -613,6 +621,7 @@
 
 &usbdrd_dwc3 {
 	dr_mode = "host";
+	power-domains = <&power RK3528_PD_VPU>;
 	extcon = <&usb2phy>;
 	status = "okay";
 };
