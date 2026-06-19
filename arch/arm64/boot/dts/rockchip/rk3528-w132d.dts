@@ -409,12 +409,7 @@
 			connect = <&vp0_out_hdmi>;
 		};
 		route_tve: route-tve {
-			status = "okay";
-			logo,uboot = "logo.bmp";
-			logo,kernel = "logo_kernel.bmp";
-			logo,mode = "center";
-			charge_logo,mode = "center";
-			connect = <&vp1_out_tve>;
+			status = "disabled";
 		};
 	};
 };
@@ -646,11 +641,11 @@
 };
 
 &tve {
-	status = "okay";
+	status = "disabled";
 };
 
 &tve_in_vp1 {
-	status = "okay";
+	status = "disabled";
 };
 
 /*
