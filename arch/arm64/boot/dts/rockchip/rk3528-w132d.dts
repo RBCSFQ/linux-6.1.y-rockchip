@@ -25,7 +25,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyFIQ0 rw rootwait";
+		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60";
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -37,7 +37,7 @@
 		interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&uart0m0_xfer>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	firmware: firmware {
@@ -59,15 +59,6 @@
 			linux,cma-default;
 		};
 
-		drm_logo: drm-logo@0 {
-			compatible = "rockchip,drm-logo";
-			reg = <0x0 0x0 0x0 0x0>;
-		};
-
-		drm_cubic_lut: drm-cubic-lut@0 {
-			compatible = "rockchip,drm-cubic-lut";
-			reg = <0x0 0x0 0x0 0x0>;
-		};
 
 		ramoops: ramoops@110000 {
 			compatible = "ramoops";
@@ -395,8 +386,6 @@
 };
 
 &display_subsystem {
-	memory-region = <&drm_logo>, <&drm_cubic_lut>;
-	memory-region-names = "drm-logo", "drm-cubic-lut";
 	status = "okay";
 
 	route {
@@ -409,12 +398,7 @@
 			connect = <&vp0_out_hdmi>;
 		};
 		route_tve: route-tve {
-			status = "okay";
-			logo,uboot = "logo.bmp";
-			logo,kernel = "logo_kernel.bmp";
-			logo,mode = "center";
-			charge_logo,mode = "center";
-			connect = <&vp1_out_tve>;
+			status = "disabled";
 		};
 	};
 };
@@ -646,11 +630,11 @@
 };
 
 &tve {
-	status = "okay";
+	status = "disabled";
 };
 
 &tve_in_vp1 {
-	status = "okay";
+	status = "disabled";
 };
 
 /*
