@@ -59,6 +59,15 @@
 			linux,cma-default;
 		};
 
+		drm_logo: drm-logo@0 {
+			compatible = "rockchip,drm-logo";
+			reg = <0x0 0x0 0x0 0x0>;
+		};
+
+		drm_cubic_lut: drm-cubic-lut@0 {
+			compatible = "rockchip,drm-cubic-lut";
+			reg = <0x0 0x0 0x0 0x0>;
+		};
 
 		ramoops: ramoops@110000 {
 			compatible = "ramoops";
@@ -386,6 +395,8 @@
 };
 
 &display_subsystem {
+	memory-region = <&drm_logo>, <&drm_cubic_lut>;
+	memory-region-names = "drm-logo", "drm-cubic-lut";
 	status = "okay";
 
 	route {
