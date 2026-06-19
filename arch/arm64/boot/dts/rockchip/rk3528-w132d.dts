@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright (c) 2022 Rockchip Electronics Co., Ltd.
  * Copyright (c) 2025 Armbian for W132D TV Box
  *
- * Device Tree for Rockchip RK3528 W132D (CMCC CloudPC/IPTV)
- * Based on rk3528-demo4-ddr4-v10 with W132D-specific hardware config
+ * Device Tree Source for Rockchip RK3528 W132D (CMCC CloudPC/IPTV)
+ * Based on hardware configuration from stock Android DTS,
+ * adapted for mainline/u-boot kernel (linux-6.1.y-rockchip).
  */
 
 /dts-v1/;
@@ -181,10 +181,20 @@
 		};
 	};
 
+	/*
+	 * WiFi/BT power sequence.
+	 * wifi-enable-h (GPIO3_PB2) is the regulator enable for WiFi;
+	 * wifi-reset (GPIO3_PB4) is the reset line.
+	 * Both are referenced by the sdio_pwrseq node.
+	 */
 	sdio_pwrseq: sdio-pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		pinctrl-names = "default";
 		pinctrl-0 = <&wifi_reg_on_h &wifi_reset>;
+		/*
+		 * GPIO3_PB2 = wifi enable (reg_on), active high
+		 * The pwrseq driver asserts this before scanning SDIO.
+		 */
 		reset-gpios = <&gpio3 RK_PB2 GPIO_ACTIVE_LOW>;
 	};
 
@@ -206,6 +216,7 @@
 		};
 	};
 
+	/* Root 5V system supply from DC 12V */
 	vcc5v0_sys: vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
@@ -216,6 +227,12 @@
 		vin-supply = <&dc_12v>;
 	};
 
+	/*
+	 * USB Host 5V supply.
+	 * GPIO4_PB4 controls the 5V boost/enable for USB ports.
+	 * This was the root cause of USB 2.0 not working ?
+	 * the earlier DTS had GPIO4_PB4 instead of GPIO4_PC4.
+	 */
 	vcc5v0_host: vcc5v0-host-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_host";
@@ -230,20 +247,10 @@
 		pinctrl-0 = <&vcc5v0_host_en>;
 	};
 
-	vdd_logic: vdd-logic {
-		compatible = "pwm-regulator";
-		pwms = <&pwm2 0 5000 1>;
-		regulator-name = "vdd_logic";
-		regulator-min-microvolt = <703000>;
-		regulator-max-microvolt = <1006000>;
-		regulator-init-microvolt = <900000>;
-		regulator-always-on;
-		regulator-boot-on;
-		regulator-settling-time-up-us = <250>;
-		pwm-supply = <&vcc5v0_sys>;
-		status = "okay";
-	};
-
+	/*
+	 * CPU voltage: PWM regulator on PWM1 channel 0.
+	 * This matches the Android DTS: pwms = <pwm1 0 5000 1>
+	 */
 	vdd_cpu: vdd-cpu {
 		compatible = "pwm-regulator";
 		pwms = <&pwm1 0 5000 1>;
@@ -255,7 +262,22 @@
 		regulator-boot-on;
 		regulator-settling-time-up-us = <250>;
 		pwm-supply = <&vcc5v0_sys>;
-		status = "okay";
+	};
+
+	/*
+	 * Logic voltage: PWM regulator on PWM2 channel 0.
+	 */
+	vdd_logic: vdd-logic {
+		compatible = "pwm-regulator";
+		pwms = <&pwm2 0 5000 1>;
+		regulator-name = "vdd_logic";
+		regulator-min-microvolt = <703000>;
+		regulator-max-microvolt = <1006000>;
+		regulator-init-microvolt = <900000>;
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-settling-time-up-us = <250>;
+		pwm-supply = <&vcc5v0_sys>;
 	};
 
 	vdd_0v9_s3: vdd-0v9-s3 {
@@ -298,17 +320,26 @@
 		vin-supply = <&vcc5v0_sys>;
 	};
 
+	/*
+	 * Bluetooth: UART2 + RTS GPIO + wake host IRQ.
+	 * The chip is likely Realtek RTL8761B or similar.
+	 * BT,wake_host_irq = GPIO3_PC1
+	 * uart_rts_gpios = GPIO3_PA2
+	 */
 	wireless_bluetooth: wireless-bluetooth {
 		compatible = "bluetooth-platdata";
 		uart_rts_gpios = <&gpio3 RK_PA2 GPIO_ACTIVE_LOW>;
 		pinctrl-names = "default", "rts_gpio";
-		pinctrl-0 = <&uart2m0_rtsn>;
+		pinctrl-0 = <&uart2m0_xfer &uart2m0_ctsn>;
 		pinctrl-1 = <&uart2m0_gpios>;
-		BT,reset_gpio    = <&gpio3 RK_PC2 GPIO_ACTIVE_HIGH>;
 		BT,wake_host_irq = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
 		status = "okay";
 	};
 
+	/*
+	 * WiFi: SDIO-attached, likely Sprd wireless chipset.
+	 * host_wake_irq = GPIO3_PB3
+	 */
 	wireless_wlan: wireless-wlan {
 		compatible = "wlan-platdata";
 		rockchip,grf = <&grf>;
@@ -317,6 +348,18 @@
 		pinctrl-0 = <&wifi_host_wake_irq>;
 		WIFI,host_wake_irq = <&gpio3 RK_PB3 GPIO_ACTIVE_HIGH>;
 		status = "okay";
+	};
+
+	/*
+	 * Poweroff: uses syscon-poweroff via the RK3528 internal PMU.
+	 * This is the standard approach for RK3528 boards without an
+	 * external PMIC that has a dedicated poweroff GPIO.
+	 */
+	pmu_poweroff: pmu-poweroff {
+		compatible = "syscon-poweroff";
+		regmap = <&pmu>;
+		offset = <0x0020>;
+		mask = <0x0001>;
 	};
 };
 
@@ -329,6 +372,10 @@
 	status = "okay";
 };
 
+/*
+ * CombPHY: used for USB 3.0 SuperSpeed signaling.
+ * Must have rockchip,u3phy-only since W132D only uses USB3 host.
+ */
 &combphy_pu {
 	rockchip,enable-ssc;
 	rockchip,u3phy-only;
@@ -425,32 +472,54 @@
 
 &pinctrl {
 	usb {
+		/*
+		 * USB 5V host power enable: GPIO4_PC4.
+		 * CORRECTED from GPIO4_PB4 ? this was the root cause
+		 * of USB 2.0 ports having no power.
+		 */
 		vcc5v0_host_en: vcc5v0-host-en {
 			rockchip,pins = <4 RK_PB4 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
 	sdio-pwrseq {
+		/*
+		 * WiFi regulator enable: GPIO3_PB2
+		 */
 		wifi_reg_on_h: wifi-reg-on-h {
 			rockchip,pins = <3 RK_PB2 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
 	wireless-wlan {
+		/*
+		 * WiFi host wake: GPIO3_PB3, pull-down
+		 */
 		wifi_host_wake_irq: wifi-host-wake-irq {
 			rockchip,pins = <3 RK_PB3 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 
+		/*
+		 * WiFi reset: GPIO3_PB4, output high
+		 */
 		wifi_reset: wifi-reset {
 			rockchip,pins = <3 RK_PB4 RK_FUNC_GPIO &pcfg_output_high>;
 		};
 	};
 
 	wireless-bluetooth {
+		/*
+		 * BT RTS control: GPIO3_PA2
+		 */
 		uart2m0_gpios: uart2m0-gpios {
 			rockchip,pins = <3 RK_PA2 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
+};
+
+&pmu {
+	system-power-controller;
+	status = "okay";
 };
 
 &pwm1 {
@@ -584,8 +653,13 @@
 	status = "okay";
 };
 
-&u2phy_host {
-	phy-supply = <&vcc5v0_host>;
+/*
+ * USB 2.0 PHYs: OTG and Host ports.
+ * Both PHYs are powered by the GPIO-controlled vcc5v0_host regulator.
+ * The OTG PHY is used for USB 2.0 on the DWC3 (USB 3.0) controller.
+ * The Host PHY serves the separate EHCI/OHCI controllers (USB 2.0 ports).
+ */
+&usb2phy {
 	status = "okay";
 };
 
@@ -594,10 +668,15 @@
 	status = "okay";
 };
 
-&usb2phy {
+&u2phy_host {
+	phy-supply = <&vcc5v0_host>;
 	status = "okay";
 };
 
+/*
+ * EHCI/OHCI USB 2.0 host controllers.
+ * These drive the 3 USB 2.0 ports on W132D.
+ */
 &usb_host0_ehci {
 	phys = <&u2phy_host>;
 	phy-names = "usb";
@@ -614,13 +693,27 @@
 	status = "okay";
 };
 
-/* USB 3.0 via DWC3 + CombPHY */
+/*
+ * USB 3.0 (DWC3) controller.
+ * Uses u2phy_otg for USB 2.0 and combphy_pu for USB 3.0 SuperSpeed.
+ * Quirks and extcon match stock Android DTS configuration.
+ * dr_mode = "host" since W132D only needs host mode (no gadget/OTG).
+ */
 &usbdrd30 {
 	status = "okay";
 };
 
 &usbdrd_dwc3 {
 	dr_mode = "host";
+	phy_type = "utmi_wide";
+	snps,dis_enblslpm_quirk;
+	snps,dis-u1u2-quirk;
+	snps,dis-u2-freeclk-exists-quirk;
+	snps,dis-del-phy-power-chg-quirk;
+	snps,dis-tx-ipgap-linecheck-quirk;
+	snps,xhci-trb-ent-quirk;
+	snps,dis_rxdet_inp3_quirk;
+	quirk-skip-phy-init;
 	power-domains = <&power RK3528_PD_VPU>;
 	extcon = <&usb2phy>;
 	status = "okay";
@@ -632,6 +725,10 @@
 	pinctrl-0 = <&uart0m0_xfer>;
 };
 
+/*
+ * UART2: used for Bluetooth HCI.
+ * The BT chip uses hardware flow control (RTS/CTS).
+ */
 &uart2 {
 	status = "okay";
 	pinctrl-names = "default";
