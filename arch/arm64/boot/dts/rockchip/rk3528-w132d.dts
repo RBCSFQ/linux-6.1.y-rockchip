@@ -229,7 +229,7 @@
 
 	/*
 	 * USB Host 5V supply.
-	 * GPIO4_PC4 controls the 5V boost/enable for USB ports.
+	 * GPIO4_PB4 controls the 5V boost/enable for USB ports.
 	 * This was the root cause of USB 2.0 not working ?
 	 * the earlier DTS had GPIO4_PB4 instead of GPIO4_PC4.
 	 */
@@ -241,7 +241,7 @@
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
 		enable-active-high;
-		gpio = <&gpio4 RK_PC4 GPIO_ACTIVE_HIGH>;
+		gpio = <&gpio4 RK_PB4 GPIO_ACTIVE_HIGH>;
 		vin-supply = <&vcc5v0_sys>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&vcc5v0_host_en>;
@@ -478,7 +478,7 @@
 		 * of USB 2.0 ports having no power.
 		 */
 		vcc5v0_host_en: vcc5v0-host-en {
-			rockchip,pins = <4 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <4 RK_PB4 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
@@ -707,7 +707,17 @@
 	dr_mode = "host";
 	phys = <&u2phy_otg>, <&combphy_pu 0>;
 	phy-names = "usb2-phy", "usb3-phy";
+	phy_type = "utmi_wide";
+	snps,dis_enblslpm_quirk;
+	snps,dis-u1u2-quirk;
+	snps,dis-u2-freeclk-exists-quirk;
+	snps,dis-del-phy-power-chg-quirk;
+	snps,dis-tx-ipgap-linecheck-quirk;
+	snps,xhci-trb-ent-quirk;
+	snps,dis_rxdet_inp3_quirk;
+	quirk-skip-phy-init;
 	power-domains = <&power RK3528_PD_VPU>;
+	extcon = <&usb2phy>;
 	status = "okay";
 };
 
