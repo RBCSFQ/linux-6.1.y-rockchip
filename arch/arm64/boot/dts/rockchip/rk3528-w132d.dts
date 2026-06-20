@@ -377,8 +377,6 @@
  * Must have rockchip,u3phy-only since W132D only uses USB3 host.
  */
 &combphy_pu {
-	rockchip,enable-ssc;
-	rockchip,u3phy-only;
 	status = "okay";
 };
 
@@ -412,7 +410,7 @@
 			status = "okay";
 			logo,uboot = "logo.bmp";
 			logo,kernel = "logo_kernel.bmp";
-			logo,mode = "center";
+			logo,mode = "fullscreen";
 			charge_logo,mode = "center";
 			connect = <&vp1_out_tve>;
 		};
@@ -663,7 +661,7 @@
 };
 
 &u2phy_otg {
-	phy-supply = <&vcc5v0_host>;
+	vbus-supply = <&vcc5v0_host>;
 	status = "okay";
 };
 
@@ -698,6 +696,7 @@
 
 &usbdrd_dwc3 {
 	dr_mode = "host";
+	maximum-speed = "high-speed";
 	extcon = <&usb2phy>;
 	status = "okay";
 };
