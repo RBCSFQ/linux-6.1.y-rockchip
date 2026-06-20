@@ -25,7 +25,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait";
+		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60";
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -37,7 +37,7 @@
 		interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&uart0m0_xfer>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	firmware: firmware {
@@ -714,6 +714,8 @@
 	snps,xhci-trb-ent-quirk;
 	snps,dis_rxdet_inp3_quirk;
 	quirk-skip-phy-init;
+	snps,dis_u2_susphy_quirk;
+	snps,dis_u3_susphy_quirk;
 	power-domains = <&power RK3528_PD_VPU>;
 	extcon = <&usb2phy>;
 	status = "okay";
