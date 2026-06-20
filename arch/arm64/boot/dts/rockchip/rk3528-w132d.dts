@@ -25,7 +25,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60 drm_kms_helper.fbdev_emulation=0";
+		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60 consoleblank=0";
 	};
 
 	fiq_debugger: fiq-debugger {
