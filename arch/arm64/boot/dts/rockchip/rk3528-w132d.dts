@@ -436,12 +436,12 @@
 
 &gpu {
 	mali-supply = <&vdd_logic>;
-	status = "okay";
+	status = "disabled";
 };
 
 &gpu_bus {
 	bus-supply = <&vdd_logic>;
-	status = "okay";
+	status = "disabled";
 };
 
 &hdmi {
