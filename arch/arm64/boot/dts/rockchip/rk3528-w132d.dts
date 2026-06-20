@@ -361,26 +361,10 @@
  * causing CPU lockup under load (e.g. password hashing).
  */
 &cpu0_opp_table {
-	opp-408000000 {
-		opp-hz = /bits/ 64 <408000000>;
-		opp-microvolt = <825000 825000 1100000>;
-		clock-latency-ns = <40000>;
-	};
-	opp-600000000 {
-		opp-hz = /bits/ 64 <600000000>;
-		opp-microvolt = <825000 825000 1100000>;
-		clock-latency-ns = <40000>;
-	};
-	opp-816000000 {
-		opp-hz = /bits/ 64 <816000000>;
-		opp-microvolt = <825000 825000 1100000>;
-		clock-latency-ns = <40000>;
-	};
-	opp-1008000000 {
-		opp-hz = /bits/ 64 <1008000000>;
-		opp-microvolt = <825000 825000 1100000>;
-		clock-latency-ns = <40000>;
-	};
+	/delete-node/ opp-2016000000;
+	/delete-node/ opp-1800000000;
+	/delete-node/ opp-1608000000;
+	/delete-node/ opp-1416000000;
 	opp-1200000000 {
 		opp-hz = /bits/ 64 <1200000000>;
 		opp-microvolt = <900000 900000 1100000>;
@@ -431,17 +415,17 @@
 };
 
 &gmac0 {
-	status = "disabled";
+	status = "okay";
 };
 
 &gpu {
 	mali-supply = <&vdd_logic>;
-	status = "disabled";
+	status = "okay";
 };
 
 &gpu_bus {
 	bus-supply = <&vdd_logic>;
-	status = "disabled";
+	status = "okay";
 };
 
 &hdmi {
