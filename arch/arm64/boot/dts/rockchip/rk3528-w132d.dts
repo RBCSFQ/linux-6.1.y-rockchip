@@ -360,16 +360,6 @@
  * table may supply insufficient voltage on this specific silicon,
  * causing CPU lockup under load (e.g. password hashing).
  */
-/*
- * TEST BUILD: CPU capped at 1.2 GHz to isolate thermal vs OPP issue.
- * If this boots stably, the problem is thermal or high-frequency OPP.
- * If it still freezes, the root cause is elsewhere (watchdog, DRAM, PMIC).
- */
-/*
- * TEST BUILD: CPU capped at 1.2 GHz to isolate root cause.
- * If stable -> thermal or high-freq OPP issue.
- * If still freezes at 118s -> watchdog/DRAM/PMIC issue.
- */
 &cpu0_opp_table {
 	opp-408000000 {
 		opp-hz = /bits/ 64 <408000000>;
@@ -398,16 +388,12 @@
 	};
 };
 
+&crypto {
+	status = "okay";
 };
-
 
 &wdt {
 	status = "disabled";
-};
-	status = "disabled";
-};
-&crypto {
-	status = "okay";
 };
 
 &dfi {
@@ -691,6 +677,7 @@
 &usbdrd_dwc3 {
 	dr_mode = "host";
 	phy_type = "utmi_wide";
+	extcon = <&usb2phy>;
 	snps,dis_enblslpm_quirk;
 	snps,dis-u1u2-quirk;
 	snps,xhci-trb-ent-quirk;
