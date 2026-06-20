@@ -25,7 +25,7 @@
 	};
 
 	chosen: chosen {
-		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60 usbcore.autosuspend=-1 clk_ignore_unused";
+		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait";
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -37,7 +37,7 @@
 		interrupts = <GIC_SPI 186 IRQ_TYPE_LEVEL_HIGH>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&uart0m0_xfer>;
-		status = "disabled";
+		status = "okay";
 	};
 
 	firmware: firmware {
