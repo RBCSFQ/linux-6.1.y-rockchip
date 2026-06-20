@@ -25,7 +25,7 @@
 	};
 
 	chosen: chosen {
-	bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60";
+		bootargs = "earlycon=uart8250,mmio32,0xff9f0000 console=ttyS0,1500000n8 rw rootwait video=HDMI-A-1:1920x1080@60";
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -678,15 +678,11 @@
  * These drive the 3 USB 2.0 ports on W132D.
  */
 &usb_host0_ehci {
-	phys = <&u2phy_host>;
-	phy-names = "usb";
 	vbus-supply = <&vcc5v0_host>;
 	status = "okay";
 };
 
 &usb_host0_ohci {
-	phys = <&u2phy_host>;
-	phy-names = "usb";
 	vbus-supply = <&vcc5v0_host>;
 	status = "okay";
 };
@@ -703,15 +699,6 @@
 
 &usbdrd_dwc3 {
 	dr_mode = "host";
-	phy_type = "utmi_wide";
-	snps,dis_enblslpm_quirk;
-	snps,dis-u1u2-quirk;
-	snps,dis-u2-freeclk-exists-quirk;
-	snps,dis-del-phy-power-chg-quirk;
-	snps,dis-tx-ipgap-linecheck-quirk;
-	snps,xhci-trb-ent-quirk;
-	snps,dis_rxdet_inp3_quirk;
-	quirk-skip-phy-init;
 	extcon = <&usb2phy>;
 	status = "okay";
 };
