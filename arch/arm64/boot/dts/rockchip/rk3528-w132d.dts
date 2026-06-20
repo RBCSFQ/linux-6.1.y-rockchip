@@ -439,9 +439,6 @@
 };
 
 &hdmi {
-	pinctrl-names = "default";
-	pinctrl-0 = <&hdmi_pins>;
-	rockchip,grf = <&grf>;
 	status = "okay";
 };
 
@@ -753,7 +750,7 @@
 
 &vop {
 	assigned-clocks = <&cru DCLK_VP0>;
-	assigned-clock-parents = <&hdmiphy_clk>;
+	assigned-clock-parents = <&inno_hdmiphy_clk>;
 	status = "okay";
 };
 
