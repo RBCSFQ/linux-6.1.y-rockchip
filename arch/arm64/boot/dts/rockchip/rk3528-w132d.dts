@@ -749,8 +749,6 @@
 };
 
 &vop {
-	assigned-clocks = <&cru DCLK_VP0>;
-	assigned-clock-parents = <&inno_hdmiphy_clk>;
 	status = "okay";
 };
 
